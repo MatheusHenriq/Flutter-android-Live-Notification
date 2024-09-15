@@ -14,37 +14,34 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   Timer? timer;
   LiveNotificationService liveNotificationService = LiveNotificationService();
-  LiveNotificationModel liveNotificationData = LiveNotificationModel(minutesToDelivery: 5, progress: 0);
+  LiveNotificationModel liveNotificationData = LiveNotificationModel(minutesToDelivery: 1, progress: 0);
 
   startPooling() {
     timer?.cancel();
     int seconds = 0;
-    setState(() {
-      liveNotificationData = LiveNotificationModel(minutesToDelivery: 5, progress: 0);
-    });
-    timer = Timer.periodic(const Duration(seconds: 1), (value) {
+    int minutes = liveNotificationData.minutesToDelivery;
+    timer = Timer.periodic(const Duration(seconds: 1), (value) async {
       setState(() {
         seconds++;
         if (seconds % 60 == 0) {
           liveNotificationData.minutesToDelivery--;
         }
-        liveNotificationData.progress = ((seconds * 100) / (5 * 60)).round();
+        liveNotificationData.progress = ((seconds * 100) / (minutes * 60)).round();
       });
-      liveNotificationService.updateNotifications(data: liveNotificationData);
-      if (liveNotificationData.minutesToDelivery == 0) {
-        endPooling();
+      if (liveNotificationData.progress == 100) {
+        await liveNotificationService.finishDeliveryNotification().then((value) {
+          timer?.cancel();
+        });
+      } else {
+        await liveNotificationService.updateNotifications(data: liveNotificationData);
       }
     });
   }
 
   endPooling() {
     timer?.cancel();
+    liveNotificationData = LiveNotificationModel(minutesToDelivery: 1, progress: 0);
     liveNotificationService.endNotifications();
-  }
-
-  //METHODS HERE
-  void startNotification() {
-    startNotification();
   }
 
   @override
@@ -61,6 +58,9 @@ class _HomeViewState extends State<HomeView> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
+                setState(() {
+                  liveNotificationData = LiveNotificationModel(minutesToDelivery: 1, progress: 0);
+                });
                 await liveNotificationService.startNotifications(data: liveNotificationData).then((value) {
                   startPooling();
                 });

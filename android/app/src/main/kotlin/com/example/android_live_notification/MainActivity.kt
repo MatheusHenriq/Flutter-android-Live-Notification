@@ -1,7 +1,5 @@
 package com.example.android_live_notification
 
-
-
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
@@ -47,6 +45,13 @@ class MainActivity: FlutterActivity() {
                         liveActivityManager.updateNotification(currentProgress =  progress, minutesToDelivery = minutes)
                     }
                 }
+            }
+            else if (call.method == "finishDeliveryNotification") {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    liveActivityManager.finishDeliveryNotification()
+                }
+                result.success("Notification delivered")
+
             }
             else if (call.method == "endNotifications") {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

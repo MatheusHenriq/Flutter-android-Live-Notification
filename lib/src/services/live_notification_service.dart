@@ -20,6 +20,14 @@ class LiveNotificationService {
     }
   }
 
+  Future<void> finishDeliveryNotification() async {
+    try {
+      await _method.invokeMethod("finishDeliveryNotification");
+    } on PlatformException catch (e) {
+      throw PlatformException(code: e.code);
+    }
+  }
+
   Future<void> endNotifications() async {
     try {
       await _method.invokeMethod("endNotifications");
