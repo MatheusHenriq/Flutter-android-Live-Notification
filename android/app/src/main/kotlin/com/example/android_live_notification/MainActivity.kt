@@ -10,12 +10,10 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.embedding.engine.FlutterEngine
 
 
-
 class MainActivity: FlutterActivity() {
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
-    private val liveActivityManager = LiveNotificationManager(context)
     private val flutterChannel = "androidInteractiveNotifications"
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -25,12 +23,15 @@ class MainActivity: FlutterActivity() {
                 call, result ->
             if (call.method == "startNotifications") {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
                     val args = call.arguments<Map<String, Any>>()
                     val progress = args?.get("progress") as? Int
                     val minutes = args?.get("minutesToDelivery") as? Int
 
                     if( progress != null && minutes != null){
-                        liveActivityManager.showNotification(currentProgress =  progress, minutesToDelivery = minutes)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            LiveNotificationManager(context).showNotification(progress,minutes)
+                        }
                     }
                 }
                 result.success("Notification displayed")
@@ -40,22 +41,23 @@ class MainActivity: FlutterActivity() {
                     val args = call.arguments<Map<String, Any>>()
                     val progress = args?.get("progress") as? Int
                     val minutes = args?.get("minutesToDelivery") as? Int
-
                     if(progress != null && minutes != null){
-                        liveActivityManager.updateNotification(currentProgress =  progress, minutesToDelivery = minutes)
+                        LiveNotificationManager(context)
+                            .updateNotification(currentProgress =  progress, minutesToDelivery = minutes)
                     }
                 }
             }
             else if (call.method == "finishDeliveryNotification") {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    liveActivityManager.finishDeliveryNotification()
+                    LiveNotificationManager(context)
+                        .finishDeliveryNotification()
                 }
                 result.success("Notification delivered")
-
             }
             else if (call.method == "endNotifications") {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    liveActivityManager.endNotification()
+                    LiveNotificationManager(context)
+                        .endNotification()
                 }
                 result.success("Notification cancelled")
             }
@@ -67,5 +69,5 @@ class MainActivity: FlutterActivity() {
             ActivityCompat.requestPermissions(this, permissions, 200)
         }
     }
-
 }
+
