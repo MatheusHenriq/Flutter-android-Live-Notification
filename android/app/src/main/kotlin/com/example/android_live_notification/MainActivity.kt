@@ -69,5 +69,12 @@ class MainActivity: FlutterActivity() {
             ActivityCompat.requestPermissions(this, permissions, 200)
         }
     }
+
+    override fun onStop() {
+        super.onStop()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LiveNotificationManager(context).endNotification()
+        }
+    }
 }
 
