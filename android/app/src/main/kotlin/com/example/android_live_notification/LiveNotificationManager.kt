@@ -17,7 +17,6 @@ class LiveNotificationManager(private val context: Context)  {
     private val remoteViews = RemoteViews("com.example.android_live_notification", R.layout.live_notification)
     private val  channelId = "notificationChannel"
     private val  notificationId = 100
-    //action to redirect to app after click on notification
     private val pendingIntent = PendingIntent.getActivity(
         context,
         200,
