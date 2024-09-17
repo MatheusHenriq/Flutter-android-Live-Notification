@@ -28,7 +28,7 @@ class _HomeViewState extends State<HomeView> {
         }
         liveNotificationData.progress = ((seconds * 100) / (minutes * 60)).round();
       });
-      if (liveNotificationData.progress == 100) {
+      if (liveNotificationData.progress > 5) {
         await liveNotificationService.finishDeliveryNotification().then((value) {
           timer?.cancel();
         });
