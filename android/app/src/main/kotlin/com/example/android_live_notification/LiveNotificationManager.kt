@@ -64,6 +64,7 @@ class LiveNotificationManager(private val context: Context)  {
         return Notification.Builder(context, channelId)
             .setSmallIcon(R.drawable.notification_icon)
             .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
             .setContentTitle("Live Notification")
             .setContentText("Your delivery arrive")
             .setCustomBigContentView(remoteViews)
