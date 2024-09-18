@@ -20,20 +20,27 @@ class _HomeViewState extends State<HomeView> {
     timer?.cancel();
     int seconds = 0;
     int minutes = liveNotificationData.minutesToDelivery;
+    int progress = 0;
     timer = Timer.periodic(const Duration(seconds: 1), (value) async {
       setState(() {
         seconds++;
         if (seconds % 60 == 0) {
           liveNotificationData.minutesToDelivery--;
         }
-        liveNotificationData.progress = ((seconds * 100) / (minutes * 60)).round();
+        if (((seconds * 100) / (minutes * 60)).round() % 3 == 0) {
+          liveNotificationData.progress = ((seconds * 100) / (minutes * 60)).round();
+        }
+        progress = ((seconds * 100) / (minutes * 60)).round();
       });
-      if (liveNotificationData.progress > 5) {
+      if (liveNotificationData.progress >= 100) {
         await liveNotificationService.finishDeliveryNotification().then((value) {
           timer?.cancel();
         });
       } else {
-        await liveNotificationService.updateNotifications(data: liveNotificationData);
+        if (progress % 5 == 0) {
+          liveNotificationData.progress = progress;
+          await liveNotificationService.updateNotifications(data: liveNotificationData);
+        }
       }
     });
   }
