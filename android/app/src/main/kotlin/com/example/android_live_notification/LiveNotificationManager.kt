@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 
+@RequiresApi(Build.VERSION_CODES.O)
 class LiveNotificationManager(private val context: Context)  {
     private val remoteViews = RemoteViews("com.example.android_live_notification", R.layout.live_notification)
     private val  channelWithHighPriority = "channelWithHighPriority"
@@ -28,25 +29,25 @@ class LiveNotificationManager(private val context: Context)  {
         },
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
-
+    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    init {
+       createNotificationChannel(channelWithDefaultPriority)
+        createNotificationChannel(channelWithHighPriority, importanceHigh = true)
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun createNotificationChannel(channelName : String, importanceHigh : Boolean = false) : NotificationManager{
+    fun createNotificationChannel(channelName : String, importanceHigh : Boolean = false) {
         val importance = if (importanceHigh) IMPORTANCE_HIGH else IMPORTANCE_DEFAULT
         val existingChannel =  (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).getNotificationChannel(channelName)
-        return if(existingChannel == null){
+         if(existingChannel == null){
             val channel =
                 NotificationChannel(channelName, "App Delivery Notification", importance).apply {
                     setSound(null, null)
                     vibrationPattern = longArrayOf(0L)
                 }
 
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
-            notificationManager
-        }else{
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         }
     }
     @RequiresApi(Build.VERSION_CODES.O)
@@ -90,7 +91,6 @@ class LiveNotificationManager(private val context: Context)  {
     @RequiresApi(Build.VERSION_CODES.O)
     fun showNotification(currentProgress: Int, minutesToDelivery: Int)  : Notification{
 
-        val notificationManager =  createNotificationChannel(channelWithHighPriority,importanceHigh = true)
 
         val notification = onFirstNotification(minutesToDelivery)
         remoteViews.setTextViewText(R.id.minutes_to_delivery, "$minutesToDelivery minutes")
@@ -103,7 +103,6 @@ class LiveNotificationManager(private val context: Context)  {
     @SuppressLint("RemoteViewLayout")
     @RequiresApi(Build.VERSION_CODES.O)
     fun updateNotification(currentProgress: Int,minutesToDelivery: Int) {
-        val notificationManager =  createNotificationChannel(channelWithDefaultPriority)
         val notification =  onGoingNotification(minutesToDelivery)
         val minuteString = if  (minutesToDelivery > 1 ) "minutes" else "minute"
         remoteViews.setTextViewText(R.id.minutes_to_delivery, "$minutesToDelivery $minuteString")
@@ -117,7 +116,6 @@ class LiveNotificationManager(private val context: Context)  {
     @RequiresApi(Build.VERSION_CODES.O)
     fun finishDeliveryNotification() {
 
-        val notificationManager =  createNotificationChannel(channelWithHighPriority,importanceHigh = true)
         val notification = onFinishNotification()
         remoteViews.setTextViewText(R.id.delivery_message, "Your delivery Arrive")
         remoteViews.setImageViewResource(R.id.image,R.drawable.delivery_arrive)
