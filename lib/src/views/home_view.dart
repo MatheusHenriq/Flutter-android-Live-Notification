@@ -27,20 +27,15 @@ class _HomeViewState extends State<HomeView> {
         if (seconds % 60 == 0) {
           liveNotificationData.minutesToDelivery--;
         }
-        if (((seconds * 100) / (minutes * 60)).round() % 3 == 0) {
-          liveNotificationData.progress = ((seconds * 100) / (minutes * 60)).round();
-        }
         progress = ((seconds * 100) / (minutes * 60)).round();
       });
-      if (liveNotificationData.progress >= 100) {
+      if (liveNotificationData.progress >= 98) {
         await liveNotificationService.finishDeliveryNotification().then((value) {
           timer?.cancel();
         });
       } else {
-        if (progress % 5 == 0) {
-          liveNotificationData.progress = progress;
-          await liveNotificationService.updateNotifications(data: liveNotificationData);
-        }
+        liveNotificationData.progress = progress;
+        await liveNotificationService.updateNotifications(data: liveNotificationData);
       }
     });
   }

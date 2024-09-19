@@ -15,7 +15,6 @@ class MainActivity: FlutterActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
     private val flutterChannel = "androidInteractiveNotifications"
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -23,7 +22,6 @@ class MainActivity: FlutterActivity() {
                 call, result ->
             if (call.method == "startNotifications") {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
                     val args = call.arguments<Map<String, Any>>()
                     val progress = args?.get("progress") as? Int
                     val minutes = args?.get("minutesToDelivery") as? Int

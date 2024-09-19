@@ -1,7 +1,6 @@
 package com.example.android_live_notification
 
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -36,8 +35,7 @@ class LiveNotificationManager(private val context: Context)  {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun createNotificationChannel(channelName : String, importanceHigh : Boolean = false) {
+    private fun createNotificationChannel(channelName : String, importanceHigh : Boolean = false) {
         val importance = if (importanceHigh) IMPORTANCE_HIGH else IMPORTANCE_DEFAULT
         val existingChannel =  (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).getNotificationChannel(channelName)
          if(existingChannel == null){
@@ -50,20 +48,19 @@ class LiveNotificationManager(private val context: Context)  {
             notificationManager.createNotificationChannel(channel)
         }
     }
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun onFirstNotification( minutesToDelivery: Int ) : Notification{
+   private fun onFirstNotification( minutesToDelivery: Int ) : Notification{
         val minuteString = if  (minutesToDelivery > 1 ) "minutes" else "minute"
         return  Notification.Builder(context, channelWithHighPriority)
             .setSmallIcon(R.drawable.notification_icon)
             .setContentTitle("Live Notification - Delivery out for shipment")
             .setContentIntent(pendingIntent)
+            .setWhen(3000)
             .setContentText("Your delivery comes in $minutesToDelivery $minuteString")
             .setCustomBigContentView(remoteViews)
             .build()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun onGoingNotification(minutesToDelivery: Int ) : Notification{
+    private fun onGoingNotification(minutesToDelivery: Int ) : Notification{
         val minuteString = if  (minutesToDelivery > 1 ) "minutes" else "minute"
         return  Notification.Builder(context, channelWithDefaultPriority)
             .setSmallIcon(R.drawable.notification_icon)
@@ -75,8 +72,7 @@ class LiveNotificationManager(private val context: Context)  {
             .build()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun onFinishNotification() : Notification{
+    private fun onFinishNotification() : Notification{3
         return Notification.Builder(context,channelWithHighPriority)
             .setSmallIcon(R.drawable.notification_icon)
             .setContentIntent(pendingIntent)
@@ -87,21 +83,16 @@ class LiveNotificationManager(private val context: Context)  {
             .build()
     }
 
-    @SuppressLint("RemoteViewLayout")
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun showNotification(currentProgress: Int, minutesToDelivery: Int)  : Notification{
+    fun showNotification(currentProgress: Int, minutesToDelivery: Int)  {
 
-
+        val minuteString = if  (minutesToDelivery > 1 ) "minutes" else "minute"
         val notification = onFirstNotification(minutesToDelivery)
-        remoteViews.setTextViewText(R.id.minutes_to_delivery, "$minutesToDelivery minutes")
+        remoteViews.setTextViewText(R.id.minutes_to_delivery, "$minutesToDelivery $minuteString")
         remoteViews.setTextViewText(R.id.progress_text, "$currentProgress%")
         remoteViews.setProgressBar(R.id.progress,100,currentProgress,false)
         notificationManager.notify(notificationId, notification)
-        return notification
     }
 
-    @SuppressLint("RemoteViewLayout")
-    @RequiresApi(Build.VERSION_CODES.O)
     fun updateNotification(currentProgress: Int,minutesToDelivery: Int) {
         val notification =  onGoingNotification(minutesToDelivery)
         val minuteString = if  (minutesToDelivery > 1 ) "minutes" else "minute"
@@ -112,8 +103,6 @@ class LiveNotificationManager(private val context: Context)  {
     }
 
 
-    @SuppressLint("RemoteViewLayout")
-    @RequiresApi(Build.VERSION_CODES.O)
     fun finishDeliveryNotification() {
 
         val notification = onFinishNotification()
@@ -126,8 +115,6 @@ class LiveNotificationManager(private val context: Context)  {
         notificationManager.notify(notificationId, notification)
     }
 
-    @SuppressLint("RemoteViewLayout")
-    @RequiresApi(Build.VERSION_CODES.O)
     fun endNotification() {
       val notificationManager =   context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.deleteNotificationChannel(channelWithHighPriority)
