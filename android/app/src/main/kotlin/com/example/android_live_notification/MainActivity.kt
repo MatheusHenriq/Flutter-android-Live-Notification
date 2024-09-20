@@ -3,7 +3,6 @@ package com.example.android_live_notification
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.plugin.common.MethodChannel
@@ -12,10 +11,12 @@ import io.flutter.embedding.engine.FlutterEngine
 
 class MainActivity: FlutterActivity() {
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private val permissions = arrayOf(Manifest.permission.POST_NOTIFICATIONS)
+    private val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        arrayOf()
+    }
     private val flutterChannel = "androidInteractiveNotifications"
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, flutterChannel).setMethodCallHandler {
